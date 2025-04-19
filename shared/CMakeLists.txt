@@ -1,0 +1,11 @@
+file(GLOB_RECURSE SHARED_SOURCES
+	${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
+)
+
+add_library(${SHARED_LIB} STATIC
+	${SHARED_SOURCES}
+)
+
+target_include_directories(${SHARED_LIB} PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
