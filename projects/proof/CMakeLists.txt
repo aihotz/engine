@@ -25,7 +25,7 @@ target_include_directories(${GAME_LIB} PRIVATE
 # link the engine and the shared lib
 target_link_libraries(${GAME_LIB} PRIVATE 
 	${SHARED_LIB}
-	${ENGINE}
+	${ENGINE_LIB}
 )
 
 ### EXECUTABLE ###
@@ -42,7 +42,7 @@ target_include_directories(${GAME_EXE} PRIVATE
 # link the engine and the shared lib
 target_link_libraries(${GAME_EXE} PRIVATE 
 	${SHARED_LIB}
-	${ENGINE}
+	${ENGINE_LIB}
 )
 
 # to organize inside visual studio explorer

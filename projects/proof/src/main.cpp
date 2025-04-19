@@ -1,21 +1,36 @@
 #include "logger.hpp"
 #include "core.hpp"
 
-void Initialize()
+struct ProofGame : public iGameProject
 {
-    shared::Log("Game code initialization!");
-}
+	virtual void RegisterTypes() override
+	{
+		shared::Log("Registering types!");
+	}
+
+	virtual void Initialize() override
+	{
+		shared::Log("Game initialization!");
+	}
+
+	virtual void Shutdown() override
+	{
+		shared::Log("Game shutdown!");
+	}
+};
 
 #ifdef DLL_BUILD
-extern "C" __declspec(dllexport) void DLLEndpointInitialize()
+extern "C" __declspec(dllexport) iGameProject* GetGameProject()
 {
     shared::Log("DLL endpoint!");
-    Initialize();
+	return new ProofGame;
 }
 #else
 int main(void)
 {
     shared::Log("Standalone executable endpoint!");
-    Initialize();
+	Engine engine;
+	engine.SetGame(new ProofGame());
+	engine.Run();
 }
 #endif

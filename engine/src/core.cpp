@@ -1,9 +1,17 @@
 #include "core.hpp"
 #include "logger.hpp"
 
+void Engine::Run()
+{
+    Initialize();
+	Update();
+	Shutdown();
+}
+
 void Engine::Initialize()
 {
     shared::Log("Engine initialize!");
+    m_gameProject->Initialize();
 }
 
 void Engine::Update()
@@ -17,5 +25,12 @@ void Engine::Update()
 
 void Engine::Shutdown()
 {
+    m_gameProject->Shutdown();
     shared::Log("Engine shutdown!");
+}
+
+void Engine::SetGame(iGameProject* gameProject)
+{
+	m_gameProject = gameProject;
+    m_gameProject->RegisterTypes();
 }
