@@ -28,3 +28,10 @@ target_include_directories(${ENGINE_LIB} PUBLIC
 
 # link the shared lib
 target_link_libraries(${ENGINE_LIB} PRIVATE ${SHARED_LIB})
+
+# external dependencies
+target_link_libraries(${ENGINE_LIB} PRIVATE
+	SDL3::SDL3
+	glbinding::glbinding
+	freetype
+)

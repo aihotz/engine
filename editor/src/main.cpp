@@ -1,8 +1,10 @@
 #include "core.hpp"
 #include "logger.hpp"
 #include <Windows.h>
+#include "input/input_manager.hpp"
 
 using GetGameFn = iGameProject * (*)();
+
 
 int main(void)
 {

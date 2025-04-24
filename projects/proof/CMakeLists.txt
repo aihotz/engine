@@ -44,7 +44,3 @@ target_link_libraries(${GAME_EXE} PRIVATE
 	${SHARED_LIB}
 	${ENGINE_LIB}
 )
-
-# to organize inside visual studio explorer
-set_target_properties(${GAME_LIB} PROPERTIES FOLDER "game")
-set_target_properties(${GAME_EXE} PROPERTIES FOLDER "game")

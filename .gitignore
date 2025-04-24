@@ -1,5 +1,6 @@
 # Build directories
 /build/
+/external
 /out/
 /bin/
 /lib/

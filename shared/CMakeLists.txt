@@ -14,3 +14,14 @@ add_library(${SHARED_LIB} STATIC
 target_include_directories(${SHARED_LIB} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
+
+# external dependencies
+target_include_directories(${SHARED_LIB} PRIVATE
+    ${FETCHCONTENT_BASE_DIR}/stb-src/
+    ${FETCHCONTENT_BASE_DIR}/tinyobjloader-src/
+)
+
+target_include_directories(${SHARED_LIB} PUBLIC
+    ${FETCHCONTENT_BASE_DIR}/glm-src/
+    ${FETCHCONTENT_BASE_DIR}/json-src/include
+)
