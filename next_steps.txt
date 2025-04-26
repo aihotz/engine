@@ -1,0 +1,122 @@
+proof:
+
+engine:
+- input
+- gameobject
+- component
+- transformation component
+- renderable
+- texture
+- material
+- resource manager
+- reflection
+- scenes
+- shader
+- shader program
+- model
+- basic rendering
+- prefabs
+- window creation
+- hierarchy system
+- transformations
+- vertex
+- component save/load
+
+editor:
+- custom type for projects so that clicking opens editor
+- load project
+- new project
+- save project
+- save as project
+- load recent (make certain editor data persistent)
+- scene hierarchy
+- console
+- directory explorer
+- editor view
+- imguizmo integration
+- run game
+- can create custom components
+- can edit a game object
+- can add components to a game object
+- file watch
+- handle reloading game dll
+- top bar
+
+proof:
+
+shared:
+- windows file dialog for reading/writing
+- logging
+- exceptions
+- file io
+- file traversal
+
+steps:
+- input
+- window creation
+## milestone 1: have dummy windows for: editor view, game view, console, directory explorer, scene hierarchy, editing, top bar
+
+- gameobject
+- component
+## milestone 2: objects with components. use editor view to show a list of components
+
+- transformations
+- transformation component
+- hierarchy system
+- scene hierarchy
+## milestone 3: objects can have children
+
+- renderable
+- texture
+- shader
+- shader program
+- model
+- vertex
+- basic rendering
+- editor view
+## milestone 4: start showing objects in editor view
+
+- imguizmo integration
+## milestone 4.1: imguizmo
+
+- material
+## milestone 4.2: material
+
+- resource manager
+- file io
+- scenes
+- component save/load
+- logging
+- exceptions
+- console
+- can add components to a game object
+## milestone 5: save and load scenes. Also have something show in the console
+
+- prefabs
+## milestone 5.1: prefab serialization/instantiation
+
+- windows file dialog for reading/writing
+- custom type for projects so that clicking opens editor
+- load project
+- new project
+- save project
+- save as project
+- top bar
+## milestone 6: basic editor functionality
+
+- load recent (make certain editor data persistent)
+## milestone 6.1: load recent
+
+- directory explorer
+- file traversal
+## milestone 6.2 directory explorer
+
+- handle reloading game dll
+- run game
+- file watch
+- can create custom components
+## milestone 7: game realoading!
+
+- reflection
+- can edit a game object
+## milestone 8: editor!

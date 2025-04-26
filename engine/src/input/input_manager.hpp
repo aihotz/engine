@@ -1,83 +1,98 @@
 #ifndef INPUT_MANAGER_HPP
 #define INPUT_MANAGER_HPP
 
-#include <singleton.hpp>
-#include <SDL3/SDL.h>
-#include <glm/glm.hpp>
-#include "key_codes.hpp"
-#include <array>
+#include "key_codes.hpp" // Keyboard, Mouse, Controller, ControllerAxis enum classes
 
-class InputManager : public Singleton<InputManager>
+namespace engine
 {
-		bool mAnythingTriggered = false;
+    class InputManager
+    {
+        struct Constants
+        {
+            static constexpr float CONTROLLER_DEAD_ZONE = 0.2f;
+        };
 
-		// KEYBOARD
-		bool	mKeyTriggered		   = false;
-		int32_t mKeyCount			   = 0;
-		bool*	mCurrentKeyboardState  = nullptr;
-		bool*	mPreviousKeyboardState = nullptr;
+        bool m_isAnythingTriggered;
 
-		// MOUSE
-		bool	  mMouseTriggered	  = false;
-		float	  mMouseScroll		  = 0.f;
-		uint32_t  mCurrentMouseState  = 0;
-		uint32_t  mPreviousMouseState = 0;
-		glm::vec2 mCurrentMousePosition {};
-		glm::vec2 mPreviousMousePosition {};
+        // KEYBOARD
+        bool  m_isAnyKeyTriggered;
+        int   m_keyCount;
+        bool* m_currentKeyboardState;
+        bool* m_previousKeyboardState;
 
-		// CONTROLLER
-		bool		 mUsingController	  = false;
-		bool		 mControllerTriggered = false;
-		SDL_Gamepad* mController		  = nullptr;
-		float		 mControllerDeadZone  = 0.2f;
+        // MOUSE
+        bool     m_isMouseTriggered;
+        float    m_mouseScroll;
+        unsigned m_currentMouseState;
+        unsigned m_previousMouseState;
+        float    m_currentMousePositionX;
+        float    m_currentMousePositionY;
+        float    m_previousMousePositionX;
+        float    m_previousMousePositionY;
 
-		std::array<bool, static_cast<size_t>(Controller::MAX_ENUM)>		 mCurrentControllerState {};
-		std::array<bool, static_cast<size_t>(Controller::MAX_ENUM)>		 mPreviousControllerState {};
-		std::array<float, static_cast<size_t>(ControllerAxis::MAX_ENUM)> mGamePadAxes {};
+        // CONTROLLER
+        bool  m_isUsingController;
+        bool  m_isControllerTriggered;
+        void* m_controller;
+        bool  m_currentControllerState[ static_cast<size_t>(Controller::MaxEnum) ];
+        bool  m_previousControllerState[ static_cast<size_t>(Controller::MaxEnum) ];
+        float m_gamepadAxes[ static_cast<size_t>(ControllerAxis::MaxEnum) ];
 
-		void ConnectController();
-		void DisconnectController();
+        InputManager();
+        ~InputManager() = default;
 
-	public:
-		void Initialize();
-		void Update();
-		void ProcessEvents(const SDL_Event& ev);
-		void Shutdown();
+        void ConnectController();
+        void DisconnectController();
 
-		glm::vec2 GetLeftJoystick() const;
-		glm::vec2 GetRightJoystick() const;
-		float	  GetAxis(ControllerAxis axis) const;
+      public:
+        InputManager(const InputManager&)                   = delete;
+        InputManager&        operator=(const InputManager&) = delete;
+        static InputManager& GetInstance();
 
-		bool Triggered(int key) const;
-		bool Triggered(Keyboard key) const;
-		bool Triggered(Controller button) const;
-		bool Triggered(Mouse button) const;
+        void Initialize();
+        void Update();
+        void ProcessEvents(void* sdl_ev);
+        void Shutdown();
 
-		bool Pressed(int key) const;
-		bool Pressed(Keyboard key) const;
-		bool Pressed(Controller button) const;
-		bool Pressed(Mouse button) const;
+        float GetLeftJoystickX() const;
+        float GetLeftJoystickY() const;
+        float GetRightJoystickX() const;
+        float GetRightJoystickY() const;
+        float GetAxis(ControllerAxis axis) const;
 
-		bool Released(int key) const;
-		bool Released(Keyboard key) const;
-		bool Released(Controller button) const;
-		bool Released(Mouse button) const;
+        bool IsTriggered(int key) const;
+        bool IsTriggered(Keyboard key) const;
+        bool IsTriggered(Controller button) const;
+        bool IsTriggered(Mouse button) const;
 
-		glm::vec2 GetMousePosition() const;
-		glm::vec2 GetPreviousMousePosition() const;
-		glm::vec2 GetMouseMovement() const;
-		glm::vec2 GetMouseMovementDirection() const;
-		float	  GetMouseScroll() const;
+        bool IsPressed(int key) const;
+        bool IsPressed(Keyboard key) const;
+        bool IsPressed(Controller button) const;
+        bool IsPressed(Mouse button) const;
 
-		bool AnythingTriggered() const;
-		bool KeyboardTriggered() const;
-		bool ControllerTriggered() const;
-		bool MouseTriggered() const;
-		bool UsingController() const;
+        bool IsReleased(int key) const;
+        bool IsReleased(Keyboard key) const;
+        bool IsReleased(Controller button) const;
+        bool IsReleased(Mouse button) const;
 
-		bool ControllerConnected() const;
-		void VibrateController(float force = 1.f, float duration = 1.f) const;
-		void VibrateControllerLowHigh(float low = 1.f, float high = 1.f, float duration = 1.f) const;
-};
+        float GetMousePositionX() const;
+        float GetMousePositionY() const;
+        float GetPreviousMousePositionX() const;
+        float GetPreviousMousePositionY() const;
+        float GetMouseMovementX() const;
+        float GetMouseMovementY() const;
+        float GetMouseScroll() const;
+
+        bool IsAnythingTriggered() const;
+        bool IsKeyboardTriggered() const;
+        bool IsControllerTriggered() const;
+        bool IsMouseTriggered() const;
+        bool IsUsingController() const;
+
+        bool IsControllerConnected() const;
+        void VibrateController(float force = 1.0f, float duration = 1.0f) const;
+        void VibrateControllerLowHigh(float low = 1.0f, float high = 1.0f, float duration = 1.0f) const;
+    };
+} // namespace engine
 
 #endif
