@@ -22,11 +22,10 @@ engine::InputManager::InputManager()
     , m_isUsingController { false }
     , m_isControllerTriggered { false }
     , m_controller { nullptr }
-    , m_currentControllerState { }
-    , m_previousControllerState { }
-    , m_gamepadAxes { }
+    , m_currentControllerState {}
+    , m_previousControllerState {}
+    , m_gamepadAxes {}
 {
-
 }
 
 engine::InputManager& engine::InputManager::GetInstance()

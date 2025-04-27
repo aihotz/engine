@@ -1,60 +1,54 @@
-#include "imgui.h"
-#include "imgui_impl_sdl3.h"
-#include "imgui_impl_sdlrenderer3.h"
+#include <glbinding/gl/gl.h>
+#include <imgui.h>
+#include <imgui_impl_opengl3.h>
+#include <imgui_impl_sdl3.h>
 #include <SDL3/SDL.h>
 #include <stdio.h>
 
+#include <input/input_manager.hpp>
+#include <window/window.hpp>
+
+// Main code
 int main(int, char**)
 {
-    // sdl init
-    if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD))
-    {
-        printf("Error: SDL_Init(): %s\n", SDL_GetError());
-        return -1;
-    }
+    engine::Window::GetInstance().Initialize();
 
-    // create window with SDL_Renderer graphics context
-    Uint32      window_flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN;
-    SDL_Window* window       = SDL_CreateWindow("Dear ImGui SDL3+SDL_Renderer example", 1280, 720, window_flags);
-    if (window == nullptr)
-    {
-        printf("Error: SDL_CreateWindow(): %s\n", SDL_GetError());
-        return -1;
-    }
-
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, nullptr);
-    SDL_SetRenderVSync(renderer, 1);
-    if (renderer == nullptr)
-    {
-        SDL_Log("Error: SDL_CreateRenderer(): %s\n", SDL_GetError());
-        return -1;
-    }
-
-    SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
-    SDL_ShowWindow(window);
-
-    // setup Dear ImGui context
+    // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
     (void)io;
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // enable Keyboard Controls
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // enable Gamepad Controls
-    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;     // enable Docking
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;     // Enable Docking
+    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;   // Enable Multi-Viewport / Platform Windows
 
-    // setup Dear ImGui style
+    // Setup Dear ImGui style
     ImGui::StyleColorsDark();
 
-    // setup Platform/Renderer backends
-    ImGui_ImplSDL3_InitForSDLRenderer(window, renderer);
-    ImGui_ImplSDLRenderer3_Init(renderer);
+    // When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
+    ImGuiStyle& style = ImGui::GetStyle();
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+    {
+        style.WindowRounding                = 0.0f;
+        style.Colors[ ImGuiCol_WindowBg ].w = 1.0f;
+    }
 
-    // our state
+    SDL_Window* window     = static_cast<SDL_Window*>(engine::Window::GetInstance().GetWindowHandle());
+    void*       gl_context = engine::Window::GetInstance().GetContextHandle();
+
+    // Setup Platform/Renderer backends
+    ImGui_ImplSDL3_InitForOpenGL(window, gl_context);
+    ImGui_ImplOpenGL3_Init("#version 460");
+
+    // Our state
     bool   show_demo_window    = true;
     bool   show_another_window = false;
     ImVec4 clear_color         = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
-    // main loop
+    engine::InputManager::GetInstance().Initialize();
+
+    // Main loop
     bool done = false;
     while (!done)
     {
@@ -66,44 +60,73 @@ int main(int, char**)
                 done = true;
             if (event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED && event.window.windowID == SDL_GetWindowID(window))
                 done = true;
+
+            switch (event.type)
+            {
+                case SDL_EVENT_GAMEPAD_ADDED:
+                case SDL_EVENT_GAMEPAD_REMOVED:
+                case SDL_EVENT_MOUSE_WHEEL:
+                    engine::InputManager::GetInstance().ProcessEvents(&event);
+                    break;
+
+                case SDL_EVENT_WINDOW_ENTER_FULLSCREEN:
+                case SDL_EVENT_WINDOW_LEAVE_FULLSCREEN:
+                    engine::Window::GetInstance().ProcessEvents(&event);
+                    break;
+            }
         }
 
-        if (SDL_GetWindowFlags(window) & SDL_WINDOW_MINIMIZED)
+        if (engine::Window::GetInstance().IsMinimized())
         {
             SDL_Delay(10);
             continue;
         }
 
-        // start the Dear ImGui frame
-        ImGui_ImplSDLRenderer3_NewFrame();
+        engine::InputManager::GetInstance().Update();
+
+        // Start the Dear ImGui frame
+        ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL3_NewFrame();
         ImGui::NewFrame();
 
-        // show the big demo window
+        // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
         if (show_demo_window)
             ImGui::ShowDemoWindow(&show_demo_window);
 
-        // rendering
+        // Rendering
         ImGui::Render();
-        //SDL_RenderSetScale(renderer, io.DisplayFramebufferScale.x, io.DisplayFramebufferScale.y);
-        SDL_SetRenderDrawColorFloat(renderer, clear_color.x, clear_color.y, clear_color.z, clear_color.w);
-        SDL_RenderClear(renderer);
-        ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), renderer);
-        SDL_RenderPresent(renderer);
+        gl::glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
+        gl::glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
+        gl::glClear(gl::ClearBufferMask::GL_COLOR_BUFFER_BIT);
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+        // Update and Render additional Platform Windows
+        // (Platform functions may change the current OpenGL context, so we save/restore it to make it easier to paste this code elsewhere.
+        //  For this specific demo app we could also call SDL_GL_MakeCurrent(window, gl_context) directly)
+        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+        {
+            SDL_Window*   backup_current_window  = SDL_GL_GetCurrentWindow();
+            SDL_GLContext backup_current_context = SDL_GL_GetCurrentContext();
+            ImGui::UpdatePlatformWindows();
+            ImGui::RenderPlatformWindowsDefault();
+            SDL_GL_MakeCurrent(backup_current_window, backup_current_context);
+        }
+
+        engine::Window::GetInstance().SwapBuffers();
     }
 
-    // cleanup
-    ImGui_ImplSDLRenderer3_Shutdown();
+    engine::InputManager::GetInstance().Shutdown();
+
+    // Cleanup
+    // [If using SDL_MAIN_USE_CALLBACKS: all code below would likely be your SDL_AppQuit() function]
+    ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL3_Shutdown();
     ImGui::DestroyContext();
 
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
+    engine::Window::GetInstance().Shutdown();
 
     return 0;
 }
-
 
 //#include "core.hpp"
 //#include "logger.hpp"
@@ -133,7 +156,7 @@ int main(int, char**)
 //    iGameProject* game = createGame();
 //    if (game) {
 //        shared::Log("Game instance created successfully!");
-//        
+//
 //        Engine engine;
 //        engine.SetGame(game);
 //        engine.Run();

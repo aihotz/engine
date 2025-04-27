@@ -3,29 +3,48 @@
 
 namespace engine
 {
-    class Window //: public Singleton<Window>
+    class Window
     {
-        void* m_window  = nullptr;
-        void* m_context = nullptr;
-
-      public:
-        void     Initialize();
-        void     Shutdown();
-        void     SwapBuffers();
-        unsigned GetWindowId() const;
-
-        enum class FullScreenMode
+        struct Constants
         {
-            Windowed,
-            FullScreen,
-            Borderless
+            static constexpr unsigned INITIAL_WINDOW_WIDTH  = 1280;
+            static constexpr unsigned INITIAL_WINDOW_HEIGHT = 720;
         };
 
-        void     SetTitle(const char* title) const;
+        void* m_window;
+        void* m_context;
+
+        bool m_isFullScreenEnabled;
+
+        Window();
+        ~Window() = default;
+
+      public:
+        Window(const Window&)                   = delete;
+        Window&        operator=(const Window&) = delete;
+        static Window& GetInstance();
+
+        void Initialize();
+        bool IsMinimized();
+        void ProcessEvents(void* sdl_ev);
+        void Shutdown();
+        void SwapBuffers();
+
+        void        SetTitle(const char* title) const;
+        const char* GetTitle() const;
+
         void     SetSize(unsigned x, unsigned y);
-        void     SetFullScreenMode(FullScreenMode mode);
         unsigned GetWidth() const;
         unsigned GetHeight() const;
+
+        void SetFullScreenEnabled(bool enabled);
+        bool IsFullScreenEnabled() const;
+
+        void SetVSyncEnabled(bool enabled);
+        bool IsVSyncEnabled() const;
+
+        void* GetWindowHandle() const;
+        void* GetContextHandle() const;
     };
 } // namespace engine
 

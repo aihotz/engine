@@ -10,6 +10,8 @@ add_executable(${EDITOR_EXE}
 	${EDITOR_SOURCES}
 )
 
+target_compile_definitions(${EDITOR_EXE} PUBLIC EDITOR)
+
 # include editor header files and shared/ so that the editor can see them
 target_include_directories(${EDITOR_EXE} PRIVATE
 	${CMAKE_CURRENT_SOURCE_DIR}/src
@@ -25,7 +27,7 @@ target_link_libraries(${EDITOR_EXE} PRIVATE
 # external dependencies
 set(IMGUI_SOURCES
 	${FETCHCONTENT_BASE_DIR}/imgui-src/backends/imgui_impl_sdl3.cpp
-	${FETCHCONTENT_BASE_DIR}/imgui-src/backends/imgui_impl_sdlrenderer3.cpp
+	${FETCHCONTENT_BASE_DIR}/imgui-src/backends/imgui_impl_opengl3.cpp
 	${FETCHCONTENT_BASE_DIR}/imgui-src/imgui.cpp
 	${FETCHCONTENT_BASE_DIR}/imgui-src/imgui_demo.cpp
 	${FETCHCONTENT_BASE_DIR}/imgui-src/imgui_draw.cpp
@@ -59,4 +61,5 @@ target_include_directories(imguizmo PUBLIC ${FETCHCONTENT_BASE_DIR}/imguizmo-src
 target_link_libraries(${EDITOR_EXE} PRIVATE 
 	imgui
 	imguizmo
+	glbinding::glbinding
 )
