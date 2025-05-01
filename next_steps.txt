@@ -102,6 +102,7 @@ steps:
 - save project
 - save as project
 - top bar
+- saving layouts! (+ reseting)
 ## milestone 6: basic editor functionality
 
 - load recent (make certain editor data persistent)
