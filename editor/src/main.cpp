@@ -1,12 +1,17 @@
+#include <SDL3/SDL.h>
 #include <glbinding/gl/gl.h>
 #include <imgui.h>
 #include <imgui_impl_opengl3.h>
 #include <imgui_impl_sdl3.h>
-#include <SDL3/SDL.h>
+#include <imgui_internal.h>
 #include <stdio.h>
 
 #include <input/input_manager.hpp>
 #include <window/window.hpp>
+
+#include <imgui_internal.h>
+
+void MainDrawing();
 
 // Main code
 int main(int, char**)
@@ -89,9 +94,7 @@ int main(int, char**)
         ImGui_ImplSDL3_NewFrame();
         ImGui::NewFrame();
 
-        // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-        if (show_demo_window)
-            ImGui::ShowDemoWindow(&show_demo_window);
+        MainDrawing();
 
         // Rendering
         ImGui::Render();
@@ -126,6 +129,72 @@ int main(int, char**)
     engine::Window::GetInstance().Shutdown();
 
     return 0;
+}
+
+void MainDrawing()
+{
+    if (ImGui::BeginMainMenuBar())
+    {
+        ImGui::MenuItem("Dummy", nullptr, false, false);
+        ImGui::EndMainMenuBar();
+    }
+
+    static ImGuiID dockIdLeft;
+    static ImGuiID dockIdBottom;
+    static ImGuiID dockIdRight;
+    ImGuiID dockSpaceId = dockSpaceId = ImGui::DockSpaceOverViewport(0, nullptr, ImGuiDockNodeFlags_PassthruCentralNode | ImGuiDockNodeFlags_NoWindowMenuButton);
+
+    static bool firstTime = true;
+    if (firstTime)
+    {
+        firstTime = false;
+
+        dockIdLeft   = ImGui::DockBuilderSplitNode(dockSpaceId, ImGuiDir_Left, 0.2f, nullptr, nullptr);
+        dockIdBottom = ImGui::DockBuilderSplitNode(dockSpaceId, ImGuiDir_Down, 0.3f, nullptr, nullptr);
+        dockIdRight  = ImGui::DockBuilderSplitNode(dockSpaceId, ImGuiDir_Right, 0.25f, nullptr, nullptr);
+    }
+
+    ImGui::SetNextWindowDockID(dockSpaceId, ImGuiCond_Appearing);
+    if (ImGui::Begin("Scene"))
+    {
+        ImGui::Text("Scene");
+    }
+    ImGui::End();
+
+    ImGui::SetNextWindowDockID(dockSpaceId, ImGuiCond_Appearing);
+    if (ImGui::Begin("Game"))
+    {
+        ImGui::Text("Game");
+    }
+    ImGui::End();
+
+    ImGui::SetNextWindowDockID(dockIdLeft, ImGuiCond_Appearing);
+    if (ImGui::Begin("Hierarchy"))
+    {
+        ImGui::Text("Hierarchy");
+    }
+    ImGui::End();
+
+    ImGui::SetNextWindowDockID(dockIdBottom, ImGuiCond_Appearing);
+    if (ImGui::Begin("Explorer"))
+    {
+        ImGui::Text("Explorer");
+    }
+    ImGui::End();    
+    
+    ImGui::SetNextWindowDockID(dockIdBottom, ImGuiCond_Appearing);
+    if (ImGui::Begin("Console"))
+    {
+        ImGui::Text("Console");
+    }
+    ImGui::End();
+
+    ImGui::SetNextWindowDockID(dockIdRight, ImGuiCond_Appearing);
+    if (ImGui::Begin("Properties"))
+    {
+        ImGui::Text("Properties");
+    }
+    ImGui::End();
 }
 
 //#include "core.hpp"

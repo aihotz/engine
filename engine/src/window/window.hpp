@@ -7,8 +7,8 @@ namespace engine
     {
         struct Constants
         {
-            static constexpr unsigned INITIAL_WINDOW_WIDTH  = 1280;
-            static constexpr unsigned INITIAL_WINDOW_HEIGHT = 720;
+            static constexpr unsigned INITIAL_WINDOW_WIDTH  = 1920;
+            static constexpr unsigned INITIAL_WINDOW_HEIGHT = 1080;
         };
 
         void* m_window;
