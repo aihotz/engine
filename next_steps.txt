@@ -1,7 +1,4 @@
-proof:
-
 engine:
-- input
 - gameobject
 - component
 - transformation component
@@ -16,11 +13,11 @@ engine:
 - model
 - basic rendering
 - prefabs
-- window creation
 - hierarchy system
 - transformations
 - vertex
 - component save/load
+- tags
 
 editor:
 - custom type for projects so that clicking opens editor
@@ -41,8 +38,6 @@ editor:
 - file watch
 - handle reloading game dll
 - top bar
-
-proof:
 
 shared:
 - windows file dialog for reading/writing
@@ -95,6 +90,9 @@ steps:
 - prefabs
 ## milestone 5.1: prefab serialization/instantiation
 
+- tags
+## milestone 5.2: tags
+
 - windows file dialog for reading/writing
 - custom type for projects so that clicking opens editor
 - load project
@@ -121,3 +119,7 @@ steps:
 - reflection
 - can edit a game object
 ## milestone 8: editor!
+
+###### future
+- memory manager
++ (game objects could have a pool for them instead of doing manual allocation each time)
