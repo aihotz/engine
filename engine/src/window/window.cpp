@@ -16,7 +16,9 @@ void DebugCallback(
     const void*       userParam)
 {
     if (severity == gl::GL_DEBUG_SEVERITY_NOTIFICATION)
+    {
         return;
+    }
 
     const char* source_str = nullptr;
     const char* type_str = nullptr;
@@ -129,9 +131,9 @@ bool engine::Window::IsMinimized()
     return SDL_GetWindowFlags(static_cast<SDL_Window*>(m_window)) & SDL_WINDOW_MINIMIZED;
 }
 
-void engine::Window::ProcessEvents(void* sdl_ev)
+void engine::Window::ProcessEvents(void* sdl_event)
 {
-    SDL_Event* ev = static_cast<SDL_Event*>(sdl_ev);
+    SDL_Event* ev = static_cast<SDL_Event*>(sdl_event);
     switch (ev->type)
     {
         case SDL_EVENT_WINDOW_ENTER_FULLSCREEN:
@@ -160,7 +162,7 @@ void engine::Window::SetTitle(const char* title) const
 {
     if (title == nullptr)
     {
-        return;
+        throw std::runtime_error("Tried to set a null window title");
     }
 
     SDL_SetWindowTitle(static_cast<SDL_Window*>(m_window), title);

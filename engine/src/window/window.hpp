@@ -17,16 +17,16 @@ namespace engine
         bool m_isFullScreenEnabled;
 
         Window();
-        ~Window() = default;
+        ~Window()                        = default;
+        Window(const Window&)            = delete;
+        Window& operator=(const Window&) = delete;
 
       public:
-        Window(const Window&)                   = delete;
-        Window&        operator=(const Window&) = delete;
         static Window& GetInstance();
 
         void Initialize();
         bool IsMinimized();
-        void ProcessEvents(void* sdl_ev);
+        void ProcessEvents(void* sdl_event);
         void Shutdown();
         void SwapBuffers();
 

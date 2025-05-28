@@ -271,7 +271,7 @@ float engine::InputManager::GetRightJoystickY() const
     return -GetAxis(ControllerAxis::RightY);
 }
 
-float engine::InputManager::GetAxis(ControllerAxis axis) const
+float engine::InputManager::GetAxis(engine::ControllerAxis axis) const
 {
     if (m_controller == nullptr)
     {
@@ -294,12 +294,12 @@ bool engine::InputManager::IsTriggered(int key) const
     return IsTriggered(keyCode);
 }
 
-bool engine::InputManager::IsTriggered(Keyboard key) const
+bool engine::InputManager::IsTriggered(engine::Keyboard key) const
 {
     return m_currentKeyboardState[ static_cast<size_t>(key) ] == true && m_previousKeyboardState[ static_cast<size_t>(key) ] == false;
 }
 
-bool engine::InputManager::IsTriggered(Controller button) const
+bool engine::InputManager::IsTriggered(engine::Controller button) const
 {
     if (m_controller == nullptr)
     {
@@ -309,7 +309,7 @@ bool engine::InputManager::IsTriggered(Controller button) const
     return m_currentControllerState[ static_cast<size_t>(button) ] == true && m_previousControllerState[ static_cast<size_t>(button) ] == false;
 }
 
-bool engine::InputManager::IsTriggered(Mouse button) const
+bool engine::InputManager::IsTriggered(engine::Mouse button) const
 {
     int mask = SDL_BUTTON_MASK(static_cast<size_t>(button));
 
@@ -322,12 +322,12 @@ bool engine::InputManager::IsPressed(int key) const
     return IsPressed(keyCode);
 }
 
-bool engine::InputManager::IsPressed(Keyboard key) const
+bool engine::InputManager::IsPressed(engine::Keyboard key) const
 {
     return m_currentKeyboardState[ static_cast<size_t>(key) ];
 }
 
-bool engine::InputManager::IsPressed(Controller button) const
+bool engine::InputManager::IsPressed(engine::Controller button) const
 {
     if (m_controller == nullptr)
     {
@@ -337,7 +337,7 @@ bool engine::InputManager::IsPressed(Controller button) const
     return m_currentControllerState[ static_cast<size_t>(button) ] == true;
 }
 
-bool engine::InputManager::IsPressed(Mouse button) const
+bool engine::InputManager::IsPressed(engine::Mouse button) const
 {
     int mask = SDL_BUTTON_MASK(static_cast<size_t>(button));
 
@@ -350,12 +350,12 @@ bool engine::InputManager::IsReleased(int key) const
     return IsReleased(keyCode);
 }
 
-bool engine::InputManager::IsReleased(Keyboard key) const
+bool engine::InputManager::IsReleased(engine::Keyboard key) const
 {
     return m_currentKeyboardState[ static_cast<size_t>(key) ] == false && m_previousKeyboardState[ static_cast<size_t>(key) ] == true;
 }
 
-bool engine::InputManager::IsReleased(Controller button) const
+bool engine::InputManager::IsReleased(engine::Controller button) const
 {
     if (m_controller == nullptr)
     {
@@ -365,7 +365,7 @@ bool engine::InputManager::IsReleased(Controller button) const
     return m_currentControllerState[ static_cast<size_t>(button) ] == false && m_previousControllerState[ static_cast<size_t>(button) ] == true;
 }
 
-bool engine::InputManager::IsReleased(Mouse button) const
+bool engine::InputManager::IsReleased(engine::Mouse button) const
 {
     int mask = SDL_BUTTON_MASK(static_cast<size_t>(button));
 

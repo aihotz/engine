@@ -39,14 +39,14 @@ namespace engine
         float m_gamepadAxes[ static_cast<size_t>(ControllerAxis::MaxEnum) ];
 
         InputManager();
-        ~InputManager() = default;
+        ~InputManager()                              = default;
+        InputManager(const InputManager&)            = delete;
+        InputManager& operator=(const InputManager&) = delete;
 
         void ConnectController();
         void DisconnectController();
 
       public:
-        InputManager(const InputManager&)                   = delete;
-        InputManager&        operator=(const InputManager&) = delete;
         static InputManager& GetInstance();
 
         void Initialize();

@@ -10,13 +10,19 @@ engine::GameObjectManager& engine::GameObjectManager::GetInstance()
     return instance;
 }
 
-void engine::GameObjectManager::RemoveRootGameObject(GameObject* object)
+engine::GameObject* engine::GameObjectManager::AddGameObject(engine::GameObject* object)
 {
-    if (object == nullptr)
+    if (std::find(m_rootGameObjects.begin(), m_rootGameObjects.end(), object) != m_rootGameObjects.end())
     {
-        return;
+        throw std::runtime_error("Trying to add an object to the game object manager twice");
     }
 
+    m_rootGameObjects.push_back(object);
+    return object;
+}
+
+void engine::GameObjectManager::RemoveRootGameObject(engine::GameObject* object)
+{
     m_rootGameObjects.remove(object);
 }
 
@@ -24,8 +30,17 @@ void engine::GameObjectManager::Update()
 {
     for (GameObject* object : m_gameObjectsMarkedAsDead)
     {
-        object->InternalDestroy();
-        RemoveRootGameObject(object);
+        GameObject* parent = object->GetParent();
+        if (parent == nullptr)
+        {
+            m_rootGameObjects.remove(object);
+        }
+        else
+        {
+            parent->m_children.remove(object);
+        }
+
+        object->DestroyInternal();
     }
 
     m_gameObjectsMarkedAsDead.clear();
@@ -40,7 +55,7 @@ void engine::GameObjectManager::Shutdown()
 
     for (GameObject* object : m_rootGameObjects)
     {
-        object->InternalDestroy();
+        object->DestroyInternal();
 
         // todo: memory manager!
         delete object;
@@ -50,11 +65,11 @@ void engine::GameObjectManager::Shutdown()
     m_gameObjectsMarkedAsDead.clear();
 }
 
-void engine::GameObjectManager::DestroyGameObject(GameObject* object)
+void engine::GameObjectManager::DestroyGameObject(engine::GameObject* object)
 {
     if (object == nullptr)
     {
-        return;
+        throw std::runtime_error("Tried to destroy null game object");
     }
 
     // do not add an object twice
@@ -66,31 +81,28 @@ void engine::GameObjectManager::DestroyGameObject(GameObject* object)
 
 engine::GameObject* engine::GameObjectManager::CreateGameObject(const char* name)
 {
+    if (name == nullptr)
+    {
+        throw std::runtime_error("Tried to create a game object with a null name");
+    }
+
+    // todo: memory manager
     GameObject* newObject = new GameObject { name };
     m_rootGameObjects.push_back(newObject);
     return newObject;
 }
 
-engine::GameObject* engine::GameObjectManager::AddGameObject(GameObject* object)
-{
-    if (object == nullptr)
-    {
-        return nullptr;
-    }
-
-    if (std::find(m_rootGameObjects.begin(), m_rootGameObjects.end(), object) == m_rootGameObjects.end())
-    {
-        m_rootGameObjects.push_back(object);
-    }
-
-    return object;
-}
-
 engine::GameObject* engine::GameObjectManager::FindGameObjectByName(const char* name) const
 {
+    if (name == nullptr)
+    {
+        throw std::runtime_error("Tried to search game object with a null name");
+    }
+    
     GameObject* foundObject = nullptr;
 
-    TraverseGameObjectsPreOrder([ & ](GameObject* object)
+    TraverseGameObjectsPreOrder(
+        [ & ](GameObject* object)
         {
             if (object->GetName() == name)
             {
@@ -98,7 +110,7 @@ engine::GameObject* engine::GameObjectManager::FindGameObjectByName(const char* 
                 return false; // stop searching
             }
 
-            return true; 
+            return true;
         });
 
     return foundObject;
@@ -106,9 +118,15 @@ engine::GameObject* engine::GameObjectManager::FindGameObjectByName(const char* 
 
 std::list<engine::GameObject*> engine::GameObjectManager::FindAllGameObjectsWithName(const char* name) const
 {
+    if (name == nullptr)
+    {
+        throw std::runtime_error("Tried to search game object with a null name");
+    }
+    
     std::list<engine::GameObject*> foundObjects;
 
-    TraverseGameObjectsPreOrder([ & ](GameObject* object)
+    TraverseGameObjectsPreOrder(
+        [ & ](GameObject* object)
         {
             if (object->GetName() == name)
             {
@@ -152,8 +170,8 @@ void engine::GameObjectManager::TraverseGameObjectsPreOrder(const std::function<
         }
 
         // add children in reverse order
-        const std::vector<GameObject*>& children = current->GetChildren();
-        for (std::vector<GameObject*>::const_reverse_iterator it = children.rbegin(); it != children.rend(); it++)
+        const std::list<GameObject*>& children = current->GetChildren();
+        for (std::list<GameObject*>::const_reverse_iterator it = children.rbegin(); it != children.rend(); it++)
         {
             stack.push(*it);
         }

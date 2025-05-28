@@ -1,8 +1,8 @@
 #ifndef GAME_OBJECT_HPP
 #define GAME_OBJECT_HPP
 
+#include <list>
 #include <string>
-#include <vector>
 
 namespace engine
 {
@@ -13,48 +13,44 @@ namespace engine
     {
         friend class GameObjectManager;
 
-        std::string mName;
-
-        GameObject*              mParent;
-        std::vector<GameObject*> mChildren;
-
-        std::vector<Component*> mComponents;
+        std::string            m_name;
+        GameObject*            m_parent;
+        std::list<GameObject*> m_children;
+        std::list<Component*>  m_components;
 
         GameObject(const std::string& name = "Game Object");
+        GameObject(const GameObject& other)            = delete;
+        GameObject& operator=(const GameObject& other) = delete;
 
-        void InternalDestroy();
+        void DestroyInternal();
         void DetachChild(GameObject* child);
 
-        static inline GameObject* edit_target = nullptr;
+        void ShutdownEvents();
 
       public:
-        static GameObject*              FindObjectByName(const std::string& name);
-        static std::vector<GameObject*> FindAllObjectsWithName(const std::string& name);
-
-        void        SetName(const std::string& name);
-        std::string GetName() const;
-
         void Initialize();
         void Shutdown();
-        void ShutdownEvents();
+
+        GameObject*                   AddChild(GameObject* child);
+        GameObject*                   CreateChild(const std::string& name = "Game Object");
+        void                          RemoveChild(GameObject* child);
+        const std::list<GameObject*>& GetChildren() const;
+        GameObject*                   GetChild(size_t index) const;
 
         GameObject* GetParent() const;
         void        SetParent(GameObject* parent);
         void        MakeParent();
 
-        void                            AddChild(GameObject* child);
-        GameObject*                     NewChild(const std::string& name = "Game Object");
-        void                            RemoveChild(GameObject* child);
-        const std::vector<GameObject*>& GetChildren() const;
-        GameObject*                     GetChild(size_t index) const;
+        void        SetName(const std::string& name);
+        std::string GetName() const;
 
         template <typename T>
         T* GetComponent() const;
 
         template <typename T>
-        std::vector<T*> GetAllComponents() const;
+        std::list<T*> GetAllComponents() const;
 
-        std::vector<Component*> GetAllComponents() const;
+        const std::list<Component*>& GetAllComponents() const;
 
         template <typename T>
         T* AddComponent();
@@ -68,12 +64,9 @@ namespace engine
         void RemoveAllComponents();
 
         void RemoveComponent(Component* component);
-
-        static void SetEditTarget(GameObject* object);
-        static void Edit();
     };
+} // namespace engine
 
 #include "game_object.inl"
-} // namespace engine
 
 #endif
