@@ -180,7 +180,14 @@ void engine::GameObject::SetParent(engine::GameObject* parent)
         }
         else
         {
-            transformation_component->SetParent(m_parent->GetComponent<TransformationComponent>());
+            TransformationComponent* parent_transformation_component = m_parent->GetComponent<TransformationComponent>();
+
+            if (parent_transformation_component == nullptr)
+            {
+                throw std::runtime_error("Parent game object does not have a transformation component");
+            }
+
+            transformation_component->SetParent(parent_transformation_component);
         }
     }
 }
