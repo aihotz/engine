@@ -7,18 +7,32 @@ namespace engine
 
     class Component
     {
-      public:
+        friend class GameObject;
+
         GameObject* m_owner;
 
-        virtual void Create() { };
-        void Initialize() { };
-        void Shutdown() { };
-        void ShutdownEvents() { };
+        Component();
+        Component(const Component&)            = delete;
+        Component& operator=(const Component&) = delete;
 
-        GameObject* GetOwner() const
-        {
-            return m_owner;
-        }
+        void Create();
+        void Shutdown();
+
+    protected:
+
+        virtual void AddToSystem();
+        virtual void RemoveFromSystem();
+
+        virtual void OnCreate();
+        virtual void Initialize();
+        virtual void Update();
+        virtual void OnShutdown();
+        virtual void ShutdownEvents();
+
+      public:
+
+        virtual ~Component() = 0;
+        GameObject* GetOwner() const;
     };
 
     // todo:
@@ -29,7 +43,5 @@ namespace engine
     };
 
 } // namespace engine
-
-#include "component.inl"
 
 #endif

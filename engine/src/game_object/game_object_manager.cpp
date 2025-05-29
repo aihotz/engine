@@ -96,7 +96,7 @@ engine::GameObject* engine::GameObjectManager::FindGameObjectByName(const char* 
 {
     if (name == nullptr)
     {
-        throw std::runtime_error("Tried to search game object with a null name");
+        throw std::runtime_error("Null name provided to search for a game object");
     }
     
     GameObject* foundObject = nullptr;
@@ -120,7 +120,7 @@ std::list<engine::GameObject*> engine::GameObjectManager::FindAllGameObjectsWith
 {
     if (name == nullptr)
     {
-        throw std::runtime_error("Tried to search game object with a null name");
+        throw std::runtime_error("Null name provided to search for a game object");
     }
     
     std::list<engine::GameObject*> foundObjects;
