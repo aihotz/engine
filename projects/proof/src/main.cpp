@@ -1,5 +1,5 @@
-#include "logger.hpp"
-#include "core.hpp"
+#include <engine/core.hpp>
+#include <shared/logger.hpp>
 
 struct ProofGame : public iGameProject
 {

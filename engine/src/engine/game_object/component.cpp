@@ -5,6 +5,10 @@ engine::Component::Component()
 {
 }
 
+engine::Component::~Component()
+{
+}
+
 void engine::Component::Create()
 {
     AddToSystem();

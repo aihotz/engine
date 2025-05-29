@@ -1,5 +1,5 @@
 #include "core.hpp"
-#include "logger.hpp"
+#include <shared/logger.hpp>
 
 void Engine::Run()
 {

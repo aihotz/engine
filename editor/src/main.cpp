@@ -1,17 +1,21 @@
+#include <stdio.h>
+
 #include <SDL3/SDL.h>
 #include <glbinding/gl/gl.h>
 #include <imgui.h>
 #include <imgui_impl_opengl3.h>
 #include <imgui_impl_sdl3.h>
 #include <imgui_internal.h>
-#include <stdio.h>
 
-#include <input/input_manager.hpp>
-#include <window/window.hpp>
+#include <engine/game_object/component.hpp>
+#include <engine/game_object/game_object.hpp>
+#include <engine/game_object/game_object_manager.hpp>
+#include <engine/input/input_manager.hpp>
+#include <engine/window/window.hpp>
 
-#include <imgui_internal.h>
-
+void MainInitialize();
 void MainDrawing();
+void MainShutdown();
 
 // Main code
 int main(int, char**)
@@ -53,6 +57,8 @@ int main(int, char**)
 
     engine::InputManager::GetInstance().Initialize();
 
+    MainInitialize();
+
     // Main loop
     bool done = false;
     while (!done)
@@ -89,6 +95,8 @@ int main(int, char**)
 
         engine::InputManager::GetInstance().Update();
 
+        engine::GameObjectManager::GetInstance().Update();
+
         // Start the Dear ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL3_NewFrame();
@@ -118,6 +126,10 @@ int main(int, char**)
         engine::Window::GetInstance().SwapBuffers();
     }
 
+    MainShutdown();
+
+    engine::GameObjectManager::GetInstance().Shutdown();
+
     engine::InputManager::GetInstance().Shutdown();
 
     // Cleanup
@@ -131,6 +143,74 @@ int main(int, char**)
     return 0;
 }
 
+struct ComponentA : public engine::Component
+{
+    virtual void OnCreate() override
+    {
+        printf("ComponentA");
+    }
+
+    virtual void OnShutdown() override
+    {
+        printf("~ComponentA");
+    }
+};
+struct ComponentB : public engine::Component
+{
+    virtual void OnCreate() override
+    {
+        printf("ComponentB");
+    }
+
+    virtual void OnShutdown() override
+    {
+        printf("~ComponentB");
+    }
+};
+struct ComponentC : public engine::Component
+{
+    virtual void OnCreate() override
+    {
+        printf("ComponentC");
+    }
+
+    virtual void OnShutdown() override
+    {
+        printf("~ComponentC");
+    }
+};
+
+namespace
+{
+    engine::GameObject* selected_object;
+}
+
+void MainInitialize()
+{
+    selected_object = nullptr;
+    
+    engine::GameObject* one   = engine::GameObjectManager::GetInstance().CreateGameObject("First");
+    engine::GameObject* two   = engine::GameObjectManager::GetInstance().CreateGameObject("Second");
+    engine::GameObject* three = engine::GameObjectManager::GetInstance().CreateGameObject("Third");
+
+    one->AddComponent<ComponentA>();
+    two->AddComponent<ComponentA>();
+    three->AddComponent<ComponentA>();
+
+    two->AddComponent<ComponentB>();
+    three->AddComponent<ComponentB>();
+
+    three->AddComponent<ComponentC>();
+
+    one->Initialize();
+    two->Initialize();
+    three->Initialize();
+}
+
+void MainShutdown()
+{
+}
+
 void MainDrawing()
 {
     if (ImGui::BeginMainMenuBar())
@@ -142,7 +222,7 @@ void MainDrawing()
     static ImGuiID dockIdLeft;
     static ImGuiID dockIdBottom;
     static ImGuiID dockIdRight;
-    ImGuiID dockSpaceId = dockSpaceId = ImGui::DockSpaceOverViewport(0, nullptr, ImGuiDockNodeFlags_PassthruCentralNode | ImGuiDockNodeFlags_NoWindowMenuButton);
+    ImGuiID        dockSpaceId = dockSpaceId = ImGui::DockSpaceOverViewport(0, nullptr, ImGuiDockNodeFlags_PassthruCentralNode | ImGuiDockNodeFlags_NoWindowMenuButton);
 
     static bool firstTime = true;
     if (firstTime)
@@ -172,6 +252,16 @@ void MainDrawing()
     if (ImGui::Begin("Hierarchy"))
     {
         ImGui::Text("Hierarchy");
+
+        engine::GameObjectManager::GetInstance().ForEachRootGameObject(
+            [](engine::GameObject* object) {
+                ImGui::Text(object->GetName().c_str());
+
+                if (ImGui::IsItemClicked())
+                {
+                    selected_object = object;
+                }
+            });
     }
     ImGui::End();
 
@@ -180,8 +270,8 @@ void MainDrawing()
     {
         ImGui::Text("Explorer");
     }
-    ImGui::End();    
-    
+    ImGui::End();
+
     ImGui::SetNextWindowDockID(dockIdBottom, ImGuiCond_Appearing);
     if (ImGui::Begin("Console"))
     {
@@ -193,6 +283,17 @@ void MainDrawing()
     if (ImGui::Begin("Properties"))
     {
         ImGui::Text("Properties");
+
+        if (selected_object != nullptr)
+        {
+            ImGui::Text(selected_object->GetName().c_str());
+
+            const std::list<engine::Component*>& components = selected_object->GetAllComponents();
+            for (engine::Component* component : components)
+            {
+                ImGui::Text(typeid(*component).name());
+            }
+        }
     }
     ImGui::End();
 }

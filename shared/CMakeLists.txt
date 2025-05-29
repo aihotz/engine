@@ -12,7 +12,12 @@ add_library(${SHARED_LIB} STATIC
 
 # make all headers publicly visible
 target_include_directories(${SHARED_LIB} PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+
+# privately avoid the intermediate shared/ directory
+target_include_directories(${SHARED_LIB} PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/shared
 )
 
 # external dependencies

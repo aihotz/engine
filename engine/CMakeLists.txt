@@ -12,18 +12,17 @@ add_library(${ENGINE_LIB} STATIC
 
 # include engine header files so that the engine can see them
 target_include_directories(${ENGINE_LIB} PRIVATE
-	${CMAKE_CURRENT_SOURCE_DIR}/src
+	${CMAKE_CURRENT_SOURCE_DIR}/src/engine
 )
 
-# stablish which headers are publicly visible
+# stablish which headers are publicly visible through the engine/ directory
 set(PUBLIC_INTERFACE
 	${CMAKE_CURRENT_SOURCE_DIR}/src # temporarily whole src/, but will be refined in the future
 )
 
-# make the public interface visible, as well as shared/
+# make the public interface visible
 target_include_directories(${ENGINE_LIB} PUBLIC
 	${PUBLIC_INTERFACE}
-	${CMAKE_SOURCE_DIR}/shared
 )
 
 # link the shared lib

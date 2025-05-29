@@ -53,7 +53,7 @@ steps:
 
 - gameobject
 - component
-## milestone 2: objects with components. use editor view to show a list of components
+## milestone 2: objects with components. use editing section of the editor to show a list of components
 
 - transformations
 - transformation component

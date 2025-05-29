@@ -11,14 +11,14 @@ namespace engine
 
         GameObject* m_owner;
 
-        Component();
-        Component(const Component&)            = delete;
-        Component& operator=(const Component&) = delete;
-
         void Create();
         void Shutdown();
 
     protected:
+
+        Component();
+        Component(const Component&)            = delete;
+        Component& operator=(const Component&) = delete;
 
         virtual void AddToSystem();
         virtual void RemoveFromSystem();

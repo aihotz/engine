@@ -12,11 +12,9 @@ add_executable(${EDITOR_EXE}
 
 target_compile_definitions(${EDITOR_EXE} PUBLIC EDITOR)
 
-# include editor header files and shared/ so that the editor can see them
+# include editor header files so that the editor can see them
 target_include_directories(${EDITOR_EXE} PRIVATE
-	${CMAKE_CURRENT_SOURCE_DIR}/src
-	${CMAKE_SOURCE_DIR}/shared
-)
+	${CMAKE_CURRENT_SOURCE_DIR}/sr)
 
 # link both the engine and the shared lib
 target_link_libraries(${EDITOR_EXE} PRIVATE
