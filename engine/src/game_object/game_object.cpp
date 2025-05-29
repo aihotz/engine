@@ -4,6 +4,7 @@
 
 #include "component.hpp"
 #include "game_object_manager.hpp"
+#include <transformation/transformation_component.hpp>
 
 engine::GameObject::GameObject(const std::string& name)
     : m_name { name }

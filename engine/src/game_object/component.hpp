@@ -34,14 +34,6 @@ namespace engine
         virtual ~Component() = 0;
         GameObject* GetOwner() const;
     };
-
-    // todo:
-    class TransformationComponent : public Component
-    {
-      public:
-        void SetParent(TransformationComponent*) { };
-    };
-
 } // namespace engine
 
 #endif
